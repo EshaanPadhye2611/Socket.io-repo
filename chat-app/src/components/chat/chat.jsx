@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { user } from '../join/join';
 import './chat.css';
 import socketIO from 'socket.io-client';
-import Message from '../message/message'; // Corrected import
+import Message from '../message/message';
+import ReactScrollToBottom from "react-scroll-to-bottom";
 
 let newSocket;
 const ENDPOINT = 'http://localhost:3000/';
@@ -10,76 +11,89 @@ const ENDPOINT = 'http://localhost:3000/';
 const Chat = () => {
   const [socket, setSocket] = useState(null);
   const [id, setId] = useState('');
+  const [messages, setMessages] = useState([]);
 
   const send = () => {
     const message = document.getElementById('chatInput').value;
-    socket.emit('message', { message, id });
+    if (message.trim() === '') return; // Prevent empty messages
+
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    console.log('Sending message:', message, 'at', time); // Log time before sending
+
+    socket.emit('message', { message, id, time });
+
     document.getElementById('chatInput').value = '';
   };
 
   useEffect(() => {
-    // Initialize the socket connection
     newSocket = socketIO(ENDPOINT, { transports: ['websocket'] });
 
-    // Event listeners
     newSocket.on('connect', () => {
       console.log('Connected to server');
       newSocket.emit('join', { user });
-      setId(newSocket.id); // Set socket ID once connected
+      setId(newSocket.id);
     });
 
     newSocket.on('welcome', (data) => {
-      console.log(`${data.user}: ${data.message}`);
+      setMessages((prevMessages) => [...prevMessages, data]);
     });
 
     newSocket.on('userJoined', (data) => {
-      console.log(`${data.user}: ${data.message}`);
+      setMessages((prevMessages) => [...prevMessages, data]);
     });
 
     newSocket.on('leave', (data) => {
-      console.log(`${data.user}: ${data.message}`);
+      setMessages((prevMessages) => [...prevMessages, data]);
     });
 
-    // Store the socket in state
     setSocket(newSocket);
 
-    // Cleanup on component unmount
     return () => {
       if (newSocket) {
-        newSocket.disconnect(); // Properly disconnect
+        newSocket.disconnect();
       }
     };
-  }, []); // Empty dependency array to run only on mount
+  }, []);
 
-  // Listen for messages once socket is set
   useEffect(() => {
     if (socket) {
       socket.on('sendMessage', (data) => {
-        console.log(`${data.user}: ${data.message}, ${data.id}`);
+        console.log('Received message:', data); // Log received message
+        setMessages((prevMessages) => [...prevMessages, data]);
       });
 
-      // Cleanup the listener on component unmount
       return () => {
-        socket.off('sendMessage'); // Remove event listener
+        socket.off('sendMessage');
       };
     }
-  }, [socket]); // This effect runs when 'socket' is updated
+  }, [socket]);
 
   return (
     <div className="chatPage">
       <div className="chatContainer">
-        <div className="header"></div>
-        <div className="chatBox">
-          <Message /> {/* Correctly use the Message component */}
+        <div className="header">
+          <h2>Meta Talk</h2>
+          <a href="/"><img src="/closeIcon.png" alt="Close" /></a>
         </div>
+        <ReactScrollToBottom className="chatBox">
+          {messages.map((item, index) => (
+            <Message 
+              key={index}
+              user={item.id === id ? '' : item.user} 
+              message={item.message} 
+              time={item.time} // Pass the timestamp
+              messageClass={item.id === id ? 'right' : 'left'}
+            />
+          ))}
+        </ReactScrollToBottom>
         <div className="inputBox">
-          <input type="text" id="chatInput" />
+          <input onKeyPress={(e) => e.key === 'Enter' ? send() : null} type="text" id="chatInput" />
           <button className="sendBtn" onClick={send}>
             <img src="/send.png" alt="Send" />
           </button>
         </div>
       </div>
-      <h1>{user}</h1>
+     
     </div>
   );
 };

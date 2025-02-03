@@ -1,11 +1,13 @@
-import React from 'react'
+import React from 'react';
+import './message.css';
 
-const message = () => {
+const Message = ({ message, user, time, messageClass }) => {
   return (
-    <div>
-      <h1>message</h1>
+    <div className={`messageBox ${messageClass}`}>
+      <p className="messageText">{user ? `${user}: ${message}` : `You: ${message}`}</p>
+      <p className="messageTime">{time}</p> {/* Display the time */}
     </div>
-  )
-}
+  );
+};
 
-export default message
+export default Message;

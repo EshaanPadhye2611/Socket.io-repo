@@ -16,15 +16,36 @@
 .header{
     background-color: crimson;
     height: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header > h2{
+    color: white;
+    margin: 2.5vmax;
+    
+}
+
+.header img{
+    margin: 2.5vmax; 
+    transition: all 0.8s;
+    cursor: pointer;
+    width: 1.2vmax;
+   
+}
+.header > img:hover{
+    transform: scale(1.2);
 }
 .chatBox{
-    border: 0.2vmax solid black;
+   
     height: 70%;
     box-sizing: border-box;
+   
 
 }
 .inputBox{
-    border: 0.2vmax solid black;
+    border-top: 0.2vmax solid black;
     height: 15%;
     box-sizing: border-box;
     display: flex;
@@ -35,6 +56,7 @@
     padding: 2vmax;
     border: none;
     outline: none;
+     border-top: 0.2vmax solid rgb(119, 103, 103);
    
 background:white;
     box-sizing: border-box;
