@@ -6,7 +6,7 @@ import Message from '../message/Message';
 import ReactScrollToBottom from "react-scroll-to-bottom";
 
 let newSocket;
-const ENDPOINT = 'http://localhost:3000/';
+const ENDPOINT = 'https://socket-io-repo.onrender.com';
 
 const Chat = () => {
   const [socket, setSocket] = useState(null);
