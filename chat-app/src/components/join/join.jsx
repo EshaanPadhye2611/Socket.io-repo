@@ -23,7 +23,7 @@ const join = () => {
         <input  onChange={(e)=>setName(e.target.value)} placeholder="Enter your name" type="text" id='joinInput'/>
         
         <Link onClick={(e)=> !name ? e.preventDefault():null} to="/chat">
-        <button className='join-btn' onClick={sendUswer}>Login IN </button>
+        <button className='join-btn' onClick={sendUswer}>Join </button>
         </Link>
      </div>
     </div>

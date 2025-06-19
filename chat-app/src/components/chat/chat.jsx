@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { user } from '../join/join';
 import './chat.css';
 import socketIO from 'socket.io-client';
-import Message from '../message/message';
+import Message from '../message/Message';
 import ReactScrollToBottom from "react-scroll-to-bottom";
 
 let newSocket;
