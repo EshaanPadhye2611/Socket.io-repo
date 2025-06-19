@@ -7,16 +7,26 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
+// Allow CORS for your frontend (replace * with your Vercel URL in production)
+app.use(cors({
+    origin: "https://socket-io-repo-mwfz.vercel.app/", // e.g., "https://your-frontend.vercel.app"
+}));
+
 const server = http.createServer(app);
-app.use(cors());
+
+// Configure CORS for Socket.IO as well
+const io = socketio(server, {
+    cors: {
+        origin: "*", // e.g., "https://your-frontend.vercel.app"
+        methods: ["GET", "POST"]
+    }
+});
 
 const users = [{}];
 
 app.get('/', (req, res) => { 
     res.send('Hello World!'); 
 });
-
-const io = socketio(server);
 
 io.on('connection', (socket) => {
     console.log('New WebSocket connection');
@@ -29,8 +39,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('message', ({message, id}) => {
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get the time in 2-digit format
-        io.emit('sendMessage', { user: users[id], message, id, time }); // Include the time when sending the message
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        io.emit('sendMessage', { user: users[id], message, id, time });
     });
 
     socket.on('disconnect', () => {
